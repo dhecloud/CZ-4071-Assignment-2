@@ -1,4 +1,4 @@
-degree.txt
+adj.txt
 ==========
 1 2 3 4 // neighbours of vertex 0
 0 2 3   // neighbours of vertex 1
@@ -14,7 +14,7 @@ degree.txt
 4 9 10 12
 9 10 11 // neighbours of vertex 12
 
-adj.txt
+degree.txt
 =======
 13 // n
 48 // 2*m

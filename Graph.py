@@ -14,7 +14,7 @@ class Graph:
         print('Destructor called, graph deleted')
         
     def read_graph(self):
-        file1 = open(self.dir+ "/degree.txt", 'r')
+        file1 = open(self.dir+ "/degreefigure2.txt", 'r')
         
         self.n = int(file1.readline())
         self.m = int(file1.readline())
@@ -28,7 +28,7 @@ class Graph:
         
         file1.close()
         
-        file2 = open(self.dir+ "/adj.txt", 'r')
+        file2 = open(self.dir+ "/figure2graph.txt", 'r')
         if self.pstart == None:
             self.pstart = [None] * (self.n+1)
         if self.edges == None:
@@ -133,10 +133,17 @@ class Graph:
             if (ok):
                 is1[u] = 1
                 res+=1
+        I = []
+        for i in range(len(is1)):
+            if is1[i] == 1:
+                I.append(i)
         
         etime = time.time()
-        print("Degree_one MIS: {0} (kernel |V|: {1}, inexact reduction: {2})\n".format(res, kernel_size, len(S)))
-        print("Took {0} seconds to get MIS".format(etime-stime))
+        
+        print("\nMIS: {0}".format(I))
+        print("\nDegree_one MIS: {0} (kernel |V|: {1}, inexact reduction: {2})".format(res, kernel_size, len(S)))
+        print("Took {0} seconds to get MIS\n".format(etime-stime))
+                
         del bin_head
         del bin_next
         del degree
