@@ -1,3 +1,9 @@
+'''
+MODIFY TXT_NAME TO THE SNAP DATASET
+'''
+
+TXT_NAME = "GrQc.txt"
+
 def read_txt(name):
     with open(name, 'r') as f:
         lines = f.readlines()
@@ -11,7 +17,7 @@ def read_txt(name):
         lines.pop(i)
     for i in range(len(lines)):
         lines[i] = lines[i].split("\t")
-    return lines
+    return lines, len(lines)
 
 def get_neighbours(edges):
     max =0
@@ -39,8 +45,8 @@ def write_adj_txt(name, neighbours):
     with open("graph/" + name, "w") as f:
         f.write(txt)
 
-def write_deg_txt(name, neighbours):
-    txt = str(len(neighbours)) + "\n"
+def write_deg_txt(name, neighbours, m):
+    txt = str(len(neighbours)) + "\n" + str(m) + "\n"
     for vertex in neighbours:
         if vertex[0] != None:
             txt += str(len(vertex)) 
@@ -51,8 +57,11 @@ def write_deg_txt(name, neighbours):
     with open("graph/" + name, "w") as f:
         f.write(txt)
 
-TXT_NAME = 'GrQc.txt'
-edges = read_txt(TXT_NAME)
-neighbours = get_neighbours(edges)
-write_adj_txt(TXT_NAME.replace(".txt","_adj.txt"), neighbours)
-write_deg_txt(TXT_NAME.replace(".txt","_deg.txt"), neighbours)
+def run(name):
+    edges, m  = read_txt(name)
+    neighbours = get_neighbours(edges)
+    write_adj_txt(TXT_NAME.replace(".txt","_adj.txt"), neighbours)
+    write_deg_txt(TXT_NAME.replace(".txt","_deg.txt"), neighbours, m)
+    
+if __name__ == "__main__":
+    run(TXT_NAME)

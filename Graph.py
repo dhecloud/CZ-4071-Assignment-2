@@ -1,7 +1,8 @@
 import time
 
 class Graph:
-    def __init__(self, dir):
+    def __init__(self, dir, verbose):
+        self.verbose = verbose
         self.dir = dir
         self.n = 0
         self.m = 0
@@ -14,7 +15,7 @@ class Graph:
         print('Destructor called, graph deleted')
         
     def read_graph(self):
-        file1 = open(self.dir+ "/degree_linear.txt", 'r')
+        file1 = open(self.dir+ "/GrQc_deg.txt", 'r')
         
         self.n = int(file1.readline())
         self.m = int(file1.readline())
@@ -28,18 +29,19 @@ class Graph:
         
         file1.close()
         
-        file2 = open(self.dir+ "/adj_linear.txt", 'r')
+        file2 = open(self.dir+ "/GrQc_adj.txt", 'r')
         if self.pstart == None:
             self.pstart = [None] * (self.n+1)
         if self.edges == None:
             self.edges = [None] * (self.m)
         
-        self.pstart[0] = 0;
+        self.pstart[0] = 0
         for i in range(self.n):
+            tmp = (file2.readline()).strip("\n").split(" ")
             if degree[i] > 0:
-                tmp = (file2.readline()).strip("\n").split(" ")
                 for j in range(degree[i]):
-                    self.edges[self.pstart[i] + j] = int(tmp[j])
+                    if degree[i] != 0 or '0':
+                        self.edges[self.pstart[i] + j] = int(tmp[j])
             
             self.pstart[i+1] = self.pstart[i] + degree[i]
         file2.close()
@@ -139,9 +141,10 @@ class Graph:
                 I.append(i)
         etime = time.time()
         
-        print("\nMIS: {0}".format(I))
-        print("\nDegree_one MIS: {0} (kernel |V|: {1}, inexact reduction: {2})".format(res, kernel_size, len(S)))
-        print("Took {0} seconds to get MIS\n".format(etime-stime))
+        if self.verbose:
+            print("\nMIS: {0}".format(I))
+            print("\nDegree_one MIS: {0} (kernel |V|: {1}, inexact reduction: {2})".format(res, kernel_size, len(S)))
+            print("Took {0} seconds to get MIS\n".format(etime-stime))
                 
         del bin_head
         del bin_next
@@ -391,9 +394,10 @@ class Graph:
             if is1[i] == 1:
                 I.append(i)
 
-        print("\nMIS: {0}".format(I))
-        print("\nDegree_two_path MIS: {0} (kernel (|V|,|E|): ({1},{2}), inexact reduction: {3})".format(res, kernel_size, kernel_edges, inexact))
-        print("Took {0} seconds to get MIS\n".format(etime-stime))
+        if self.verbose:
+            print("\nMIS: {0}".format(I))
+            print("\nDegree_two_path MIS: {0} (kernel (|V|,|E|): ({1},{2}), inexact reduction: {3})".format(res, kernel_size, kernel_edges, inexact))
+            print("Took {0} seconds to get MIS\n".format(etime-stime))
 
         del bin_head
         del bin_next
@@ -495,7 +499,8 @@ class Graph:
     #def delete_vertex(self, v, is, degree, pend=None, degree_ones=None, degree_twos=None, tri=None, adj=None, dominate=None, dominated=None, head=None, es=None, bin_head=None, bin_next=None, bin_pre=None):
 
 if __name__ == "__main__":
-    graph = Graph("graph")
+    verbose = True          #set to false if too much print
+    graph = Graph("graph", verbose)
     ans=True
     while ans:
         print("""
@@ -503,7 +508,7 @@ if __name__ == "__main__":
             2.Linear Time
             3.Exit
             """)
-        ans = input("Choose your method:")
+        ans =input("Choose your method:")
         if ans == "1":
             graph.read_graph()
             graph.degree_one_kernel_and_remove_max_degree()
