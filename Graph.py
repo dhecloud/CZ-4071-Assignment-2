@@ -143,8 +143,8 @@ class Graph:
         
         if self.verbose:
             print("\nMIS: {0}".format(I))
-            print("\nDegree_one MIS: {0} (kernel |V|: {1}, inexact reduction: {2})".format(res, kernel_size, len(S)))
-            print("Took {0} seconds to get MIS\n".format(etime-stime))
+        print("\nDegree_one MIS: {0} (kernel |V|: {1}, inexact reduction: {2})".format(res, kernel_size, len(S)))
+        print("Took {0} seconds to get MIS\n".format(etime-stime))
                 
         del bin_head
         del bin_next
@@ -396,8 +396,8 @@ class Graph:
 
         if self.verbose:
             print("\nMIS: {0}".format(I))
-            print("\nDegree_two_path MIS: {0} (kernel (|V|,|E|): ({1},{2}), inexact reduction: {3})".format(res, kernel_size, kernel_edges, inexact))
-            print("Took {0} seconds to get MIS\n".format(etime-stime))
+        print("\nDegree_two_path MIS: {0} (kernel (|V|,|E|): ({1},{2}), inexact reduction: {3})".format(res, kernel_size, kernel_edges, inexact))
+        print("Took {0} seconds to get MIS\n".format(etime-stime))
 
         del bin_head
         del bin_next
