@@ -2,7 +2,7 @@
 MODIFY TXT_NAME TO THE SNAP DATASET
 '''
 
-TXT_NAME = "GrQc.txt"
+TXT_NAME = "ca-CondMat.txt"
 
 def read_txt(name):
     with open(name, 'r') as f:
@@ -28,10 +28,13 @@ def get_neighbours(edges):
     neighbours = [[None]] * (max+1)
     for i in range(len(edges)):
         neighbours[int(edges[i][0])] = neighbours[int(edges[i][0])] + [(int(edges[i][1]))]
+    nodes =0
     for i in range(len(neighbours)):
         if len(neighbours[i]) > 1:
             neighbours[i].pop(0)
-    return neighbours
+            nodes += 1
+            
+    return neighbours, nodes
     
 def write_adj_txt(name, neighbours):
     txt = ""
@@ -45,8 +48,8 @@ def write_adj_txt(name, neighbours):
     with open("graph/" + name, "w") as f:
         f.write(txt)
 
-def write_deg_txt(name, neighbours, m):
-    txt = str(len(neighbours)) + "\n" + str(m) + "\n"
+def write_deg_txt(name, neighbours, m, nodes):
+    txt = str(len(neighbours)) + "\n"+  str(nodes) + "\n" + str(m) + "\n"
     for vertex in neighbours:
         if vertex[0] != None:
             txt += str(len(vertex)) 
@@ -59,9 +62,9 @@ def write_deg_txt(name, neighbours, m):
 
 def run(name):
     edges, m  = read_txt(name)
-    neighbours = get_neighbours(edges)
+    neighbours, nodes = get_neighbours(edges)
     write_adj_txt(TXT_NAME.replace(".txt","_adj.txt"), neighbours)
-    write_deg_txt(TXT_NAME.replace(".txt","_deg.txt"), neighbours, m)
+    write_deg_txt(TXT_NAME.replace(".txt","_deg.txt"), neighbours, m, nodes)
     
 if __name__ == "__main__":
     run(TXT_NAME)

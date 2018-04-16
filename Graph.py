@@ -6,6 +6,7 @@ class Graph:
         self.dir = dir
         self.n = 0
         self.m = 0
+        self.listsize =0
         
         self.pstart = None
         self.edges = None
@@ -16,7 +17,8 @@ class Graph:
         
     def read_graph(self):
         file1 = open(self.dir+ "/GrQc_deg.txt", 'r')
-        
+        #file1 = open(self.dir+ "/degree_linear.txt", 'r')
+        self.listsize = int(file1.readline())
         self.n = int(file1.readline())
         self.m = int(file1.readline())
         
@@ -30,13 +32,14 @@ class Graph:
         file1.close()
         
         file2 = open(self.dir+ "/GrQc_adj.txt", 'r')
+        #file2 = open(self.dir+ "/adj_linear.txt", 'r')
         if self.pstart == None:
-            self.pstart = [None] * (self.n+1)
+            self.pstart = [None] * (self.listsize+1)
         if self.edges == None:
             self.edges = [None] * (self.m)
         
         self.pstart[0] = 0
-        for i in range(self.n):
+        for i in range(self.listsize):
             tmp = (file2.readline()).strip("\n").split(" ")
             if degree[i] > 0:
                 for j in range(degree[i]):
@@ -53,21 +56,20 @@ class Graph:
     def degree_one_kernel_and_remove_max_degree(self):                  #BDOne
         
         stime = time.time()
-        
         is1 = []
-        for i in range(self.n):
+        for i in range(self.listsize):
             is1.append(1)
             
-        bin_head = [-1] * self.n
-        bin_next = [None] * self.n
-        degree = [None] * self.n
+        bin_head = [-1] * self.listsize
+        bin_next = [None] * self.listsize
+        degree = [None] * self.listsize
         
         degree_ones = []
         S = []
 
         max_d = 0
         res = 0
-        for i in range(self.n):
+        for i in range(self.listsize):
             degree[i] =  int(self.pstart[i+1] - self.pstart[i])
             bin_next[i] = bin_head[degree[i]] 
             bin_head[degree[i]] = i
@@ -79,8 +81,9 @@ class Graph:
             if degree[i] > max_d:
                 max_d = degree[i]
 
-
-        fixed = [0] * self.n
+        
+        inexistnodes= [i for i, j in enumerate(degree) if j == 0]
+        fixed = [0] * self.listsize
         
         kernel_size = 0
         first_time = 1
@@ -99,7 +102,7 @@ class Graph:
                         
             if (first_time):
                 first_time = 0;
-                for k in range(self.n):
+                for k in range(self.listsize):
                     if ((is1[k]) and (degree[k] >0)):
                         kernel_size += 1
                     else:
@@ -139,16 +142,23 @@ class Graph:
         for i in range(len(is1)):
             if is1[i] == 1:
                 I.append(i)
+
+        for node in inexistnodes:
+            I.remove(node)
+        
+        res -= len(inexistnodes)
+        
         etime = time.time()
         
         if self.verbose:
             print("\nMIS: {0}".format(I))
         print("\nDegree_one MIS: {0} (kernel |V|: {1}, inexact reduction: {2})".format(res, kernel_size, len(S)))
         print("Took {0} seconds to get MIS\n".format(etime-stime))
-                
+
         del bin_head
         del bin_next
         del degree
+    
     
     def delete_vertex(self, v, is1, degree, degree_ones):
         is1[v] = 0
@@ -161,7 +171,8 @@ class Graph:
                     res += 1
                 elif (degree[w] == 1):
                     degree_ones.append(w)
-        print("vertex {0} deleted".format(v))
+        if self.verbose:
+            print("vertex {0} deleted".format(v))
         return res
 
 
@@ -172,17 +183,17 @@ class Graph:
         for i in range(self.m):
             tmp_edges[i] = self.edges[i]
 
-        tmp_start = [None] * (self.n+1)
-        for i in range(0,self.n+1):
+        tmp_start = [None] * (self.listsize+1)
+        for i in range(0,self.listsize+1):
             tmp_start[i] = self.pstart[i]
 
         is1 = []
-        for i in range(self.n):
+        for i in range(self.listsize):
             is1.append(1)
 
-        bin_head = [-1] * self.n
-        bin_next = [None] * self.n
-        degree = [None] * self.n
+        bin_head = [-1] * self.listsize
+        bin_next = [None] * self.listsize
+        degree = [None] * self.listsize
 
         degree_ones = []
         degree_twos = []
@@ -191,7 +202,7 @@ class Graph:
 
         max_d = 0
         res = 0
-        for i in range(self.n):
+        for i in range(self.listsize):
             degree[i] = int(self.pstart[i+1] - self.pstart[i])
             bin_next[i] = bin_head[degree[i]]
             bin_head[degree[i]] = i;
@@ -206,10 +217,11 @@ class Graph:
             if(degree[i] > max_d):
                 max_d = degree[i]
 
-        fixed = [0] * self.n
-
-        pend = [None] * self.n
-        for i in range(self.n):
+        fixed = [0] * self.listsize
+        inexistnodes= [i for i, j in enumerate(degree) if j == 0]
+        
+        pend = [None] * self.listsize
+        for i in range(self.listsize):
             pend[i] = self.pstart[i+1]
 
         kernel_size = inexact = 0
@@ -334,7 +346,7 @@ class Graph:
             if(first_time):
                 S_size = len(S)
                 first_time = 0
-                for k in range(self.n):
+                for k in range(self.listsize):
                     if(is1[k] and degree[k] > 0):
                         kernel_size += 1
                         for j in range(self.pstart[k],pend[k]):
@@ -357,7 +369,7 @@ class Graph:
                             bin_next[v] = bin_head[degree[v]]
                             bin_head[degree[v]] = v
                         else:
-                            S.append((v,self.n))
+                            S.append((v,self.listsize))
                             inexact += 1
                             res += self.delete_vertex_lineartime(v=v, pend=pend, is1=is1, degree=degree, degree_ones=degree_ones, degree_twos=degree_twos)
                             bin_head[max_d] = tmp
@@ -371,7 +383,7 @@ class Graph:
             u2 = S[i][1]        #access the second element of tuple
             assert(not is1[u1])
 
-            if(u2 != self.n):
+            if(u2 != self.listsize):
                 if(not is1[u2]):
                     is1[u1] = 1
                     res += 1
@@ -394,6 +406,10 @@ class Graph:
             if is1[i] == 1:
                 I.append(i)
 
+        for node in inexistnodes:
+            I.remove(node)
+        
+        res -= len(inexistnodes)
         if self.verbose:
             print("\nMIS: {0}".format(I))
         print("\nDegree_two_path MIS: {0} (kernel (|V|,|E|): ({1},{2}), inexact reduction: {3})".format(res, kernel_size, kernel_edges, inexact))
@@ -418,7 +434,8 @@ class Graph:
                     degree_ones.append(w)
                 elif(degree[w] == 2):
                     degree_twos.append(w)
-        print("vertex {0} deleted".format(v))
+        if self.verbose:
+            print("vertex {0} deleted".format(v))
         return res
 
 
@@ -453,53 +470,9 @@ class Graph:
                 return i
         print("WA in edge_rewire!")
         return 0
-    '''
-    def degree_two_kernel_and_remove_max_degree_with_contraction(self):
-        
-    
-        
-    def degree_two_kernel_dominate_lp_and_remove_max_degree_without_contraction(self):
-        
-    def greedy(self):
-        
-    def greedy_dynamic(self):
-    
-    def _general_swap(self, is, fixed=None):
-        
-    def _check_is(self, is, count):
-    
-    def _compute_upperbound(self, is, fixed=None):
-        
-    def _get_two_neighbours(self, u, is, u1, u2):
-        
-    def _get_other_neighbor(self, u, is, u1):
-        
-    def _self.exist_edge(self, u1, u2, pend = None):
-    
-    def _self.edge_rewire(self, u, u1, u2, pend = None):
-    
-    def _find_other_endpoint(self, u, v, is):
-        
-    def _remove_degree_one_two(self, degree_ones, degree_twos, is, degree, adj, S):
-        
-    def _lp_reduction(self, ids, ids_n, is, degree):
-        
-    def _self.shrink(self, u, end, is, tri=None):
-        
-    def _update_triangle(self, u1, u2, pend, is, adj, tri, degree, dominate, dominated):
-        
-    def _dominated_check(self, u, pend, is, tri, degree):
-        
-    def _compute_triangle_counts(self, tri, pend, adj, is, degree, dominate, dominated):
-    
-    def _construct_degree_increase(self, ids):
-        
-    '''
-
-    #def delete_vertex(self, v, is, degree, pend=None, degree_ones=None, degree_twos=None, tri=None, adj=None, dominate=None, dominated=None, head=None, es=None, bin_head=None, bin_next=None, bin_pre=None):
 
 if __name__ == "__main__":
-    verbose = True          #set to false if too much print
+    verbose = False          #set to false if too much print
     graph = Graph("graph", verbose)
     ans=True
     while ans:
