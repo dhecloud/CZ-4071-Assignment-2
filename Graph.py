@@ -399,7 +399,6 @@ class Graph:
                 is1[u1] = 1
                 res += 1
 
-        etime = time.time()
 
         I = []
         for i in range(len(is1)):
@@ -410,6 +409,8 @@ class Graph:
             I.remove(node)
         
         res -= len(inexistnodes)
+        
+        etime = time.time()
         if self.verbose:
             print("\nMIS: {0}".format(I))
         print("\nDegree_two_path MIS: {0} (kernel (|V|,|E|): ({1},{2}), inexact reduction: {3})".format(res, kernel_size, kernel_edges, inexact))
