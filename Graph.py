@@ -1,5 +1,8 @@
 import time
 
+GRAPH_NAME = "ca-CondMat"
+verbose = False          #set to false if too much print
+
 class Graph:
     def __init__(self, dir, verbose):
         self.verbose = verbose
@@ -15,9 +18,8 @@ class Graph:
     def __del__(self):
         print('Destructor called, graph deleted')
         
-    def read_graph(self):
-        file1 = open(self.dir+ "/GrQc_deg.txt", 'r')
-        #file1 = open(self.dir+ "/degree_linear.txt", 'r')
+    def read_graph(self, name):
+        file1 = open(self.dir+ "/" + GRAPH_NAME + "_deg.txt", 'r')
         self.listsize = int(file1.readline())
         self.n = int(file1.readline())
         self.m = int(file1.readline())
@@ -31,8 +33,7 @@ class Graph:
         
         file1.close()
         
-        file2 = open(self.dir+ "/GrQc_adj.txt", 'r')
-        #file2 = open(self.dir+ "/adj_linear.txt", 'r')
+        file2 = open(self.dir+ "/" + GRAPH_NAME + "_adj.txt", 'r')
         if self.pstart == None:
             self.pstart = [None] * (self.listsize+1)
         if self.edges == None:
@@ -473,7 +474,6 @@ class Graph:
         return 0
 
 if __name__ == "__main__":
-    verbose = False          #set to false if too much print
     graph = Graph("graph", verbose)
     ans=True
     while ans:
@@ -484,10 +484,10 @@ if __name__ == "__main__":
             """)
         ans =input("Choose your method:")
         if ans == "1":
-            graph.read_graph()
+            graph.read_graph(GRAPH_NAME)
             graph.degree_one_kernel_and_remove_max_degree()
         elif ans == "2":
-            graph.read_graph()
+            graph.read_graph(GRAPH_NAME)
             graph.degree_two_kernel_and_remove_max_degree_without_contraction()
         elif ans == "3":
             break
